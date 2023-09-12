@@ -1,9 +1,10 @@
 import json
 
-from content_tools import settings
-from content_tools.helpers import strings, download
-from content_tools.libary.verify.sdk import ddddocr
-from content_tools.libary.verify.base import Base
+import ddddocr
+
+from configs import settings
+from helpers import download, strings
+from helpers.verify.base import Base
 
 
 class DdddOcrVerify(Base):

@@ -6,8 +6,8 @@ from io import BytesIO
 import requests
 from PIL import Image
 
-from content_tools import settings
-from content_tools.helpers import strings
+from configs import settings
+from helpers import strings
 
 
 def download_image(url, **kwargs):

@@ -1,5 +1,6 @@
-from content_tools.libary.verify.abstract import Abstract
-from content_tools.libary.verify.verify_ddddocr import DdddOcrVerify
+from helpers.verify.abstract import Abstract
+from helpers.verify.verify_ddddocr import DdddOcrVerify
+from helpers.verify.verify_ydm import VerifyYdm
 
 VERIFY_TYPE_YDM = "ydm"  # 云码，官网：https://www.jfbym.com/
 VERIFY_TYPE_CJY = "CJY"  # 超级鹰,官网：https://www.chaojiying.com/
@@ -11,8 +12,6 @@ def create_verify(type: str) -> Abstract:
     验证码工厂方法
     """
     if type == VERIFY_TYPE_YDM:
-        # 云码类型
-        from content_tools.libary.verify.verify_ydm import VerifyYdm
         # token可从配置中获取，目前写死
         return VerifyYdm(token="288PYUoIsPS4xxC7S0yqeLvDiZ5toYd61bjNXO9dTfk")
     elif type == VERIFY_TYPE_DDDDOCR:

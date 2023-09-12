@@ -1,9 +1,9 @@
 import json
 
-from content_tools import settings
-from content_tools.helpers import download, strings
-from content_tools.libary.verify.base import Base
-from content_tools.libary.verify.sdk.ydm_verify import YdmVerify
+from configs import settings
+from helpers import download, strings
+from helpers.verify.base import Base
+from helpers.verify.sdk.ydm_verify import YdmVerify
 
 
 class VerifyYdm(Base):
@@ -26,7 +26,7 @@ class VerifyYdm(Base):
             raise Exception("图片路径不能同时为空")
         # 如果图片为外部url，则下载图片
         if image_path.startswith("http"):
-            download_rs = download.download_image(image_path, save_directory=settings.BASE_CLICK_SAME_SHAPE_DIR,
+            download_rs = download.download_image(image_path, save_directory=settings.DIRS["BASE_CLICK_SAME_SHAPE_DIR"],
                                                   resize=kwargs.get("resize"),)
             image_path = download_rs.get("file_path")
 

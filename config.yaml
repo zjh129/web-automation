@@ -1,0 +1,9 @@
+# redis数据库配置
+redis:
+  type: 'node' # node: 单机模式, cluster: 集群模式
+  cluster:
+    - host: '127.0.0.1'
+      port: 6379
+  host: '127.0.0.1'
+  port: 6379
+  passwd: 'test'

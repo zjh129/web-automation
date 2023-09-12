@@ -1,8 +1,5 @@
 import re
 
-from django.http import JsonResponse
-
-
 def api_json_response(code=0, message='success', data=None):
     """
     返回json格式的数据
