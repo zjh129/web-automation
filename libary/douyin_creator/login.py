@@ -4,11 +4,11 @@ import random
 from configs import settings
 from helpers import log, download, utils
 from helpers.common import validate_phone_number
-from lib.douyin_creator.base import CreatorBase
-from lib.douyin_creator.models.captcha import CaptchaPage
-from lib.douyin_creator.models.content_login import ContentLoginPage
-from lib.exception_handler import exception_handler
-from lib.exceptions import ActionException
+from libary.douyin_creator.base import CreatorBase
+from libary.douyin_creator.models.captcha import CaptchaPage
+from libary.douyin_creator.models.content_login import ContentLoginPage
+from libary.exception_handler import exception_handler
+from libary.exceptions import ActionException
 
 
 class CreatorLogin(CreatorBase):

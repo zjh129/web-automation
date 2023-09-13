@@ -7,8 +7,8 @@ from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from configs import settings
 from helpers import log, utils
 from helpers.verify import factory
-from lib.base_page import BasePage
-from lib.exceptions import ActionException
+from libary.base_page import BasePage
+from libary.exceptions import ActionException
 
 
 class CaptchaPage(BasePage):

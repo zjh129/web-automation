@@ -1,5 +1,5 @@
 from helpers import log
-from lib.douyin_creator.content import CreatorContent
+from libary.douyin_creator.content import CreatorContent
 from tests import test_env_config
 
 

@@ -2,11 +2,11 @@ from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from datetime import datetime, timedelta
 
 from helpers import log
-from lib.base_page import BasePage
-from lib.exceptions import ActionException
+from libary.base_page import BasePage
+from libary.exceptions import ActionException
 
 
-class ContentUploadImageTextPage(BasePage):
+class ContentUploadVideoPage(BasePage):
     """
     创作平台-作品发布-页面元素、基础操作
     """
@@ -24,7 +24,7 @@ class ContentUploadImageTextPage(BasePage):
         """
         跳转到首页
         """
-        self.page.goto("/creator-micro/content/upload?default-tab=3")
+        self.page.goto("/creator-micro/content/upload")
 
     def tab_video(self):
         """
@@ -46,39 +46,62 @@ class ContentUploadImageTextPage(BasePage):
         """
         return self.page.locator(
             'xpath=//div[contains(@class,"card-container-creator-layout")]//div[text()="发布全景视频"]')
+
+    def semi_check_see_ok(self):
+        """
+        发文助手-完成按钮
+        """
+        return self.page.locator(
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//button[span[text()="完成"]]')
+
+    def semi_check_btn(self):
+        """
+        发文助手-检测按钮
+        """
+        return self.page.locator(
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//section[contains(@class, "mainPanelWrapper")]//section[contains(@class, "resultWrapper")]//[p[contains(text(),"检测")]]')
+
+    def semi_check_box(self):
+        """
+        发文助手-检测结果
+        """
+        return self.page.locator(
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//section[contains(@class, "mainPanelWrapper")]')
+
+    def semi_check_result_title(self):
+        """
+        发文助手-检测结果标题
+        """
+        return self.page.locator(
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//section[contains(@class, "mainPanelWrapper")]//section[contains(@class, "resultWrapper")]//section[contains(@class, "titleWrapper")]')
+
+    def semi_check_result_content(self):
+        """
+        发文助手-检测结果内容
+        """
+        return self.page.locator(
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//section[contains(@class, "mainPanelWrapper")]//section[contains(@class, "resultWrapper")]//section[contains(@class, "contentWrapper")]')
+
     def btn_upload(self):
         """
         上传按钮
         """
         return self.page.locator(
-            'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "upload") and descendant::text()[contains(., "图片")]]')
-
-    def set_upload_image(self, image_list):
-        """
-        上传图片
-        """
-        self.page.wait_for_load_state("domcontentloaded")
-        selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "upload") and descendant::text()[contains(., "图片")]]'
-        locator = self.page.locator(selector)
-        with self.page.expect_file_chooser() as fc_info:
-            bounding = locator.bounding_box()
-            self.page.mouse.click(bounding["x"] + bounding["width"] / 2, bounding["y"] + bounding["height"] / 2)
-
-        fc_info.value.set_files(image_list)
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//label[descendant::text()[contains(., "视频文件")]]')
 
     def btn_re_upload(self):
         """
         重新上传按钮
         """
         return self.page.locator(
-            'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "phone-container")]//button[span[contains(text(), "重新上传")]]')
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "phone-container")]//div[div[text()="重新上传"]]')
 
-    def toast(self):
+    def video_preview(self):
         """
-        提示框
+        视频预览
         """
         return self.page.locator(
-            'xpath=//div[contains(@class, "semi-toast-wrapper")]/div[contains(@class, "semi-toast-warning") or contains(@class, "semi-toast-error")]')
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "phone-container")]//video[contains(@class, "player-video")]')
 
     def set_cover(self, image_path):
         """
@@ -88,35 +111,27 @@ class ContentUploadImageTextPage(BasePage):
             image_path (str): 封面图片路径
 
         """
-        upload_btn_selector = 'xpath=//div[contains(@class, "card-container-creator-layout")]//div[text() = "封面设置"]/following-sibling::div[1]//span[span[text()="编辑封面"]]'
+        upload_btn_selector = 'xpath=//div[contains(@class, "card-container-creator-layout")]//div[contains(@class, "content-upload-new")]//div[div[text()="选择封面"]]'
         # 点击选择封面按钮
         self.page.locator(upload_btn_selector).click()
         # 切换封面上传标签页
-        upload_box_selector = 'xpath=//div[text()="设置封面"]/following-sibling::div[1]'
+        upload_box_selector = 'xpath=//div[contains(@class, "coverSelect")]'
         # 等待上传框显示
-        self.page.locator(upload_box_selector).wait_for(state="visible")
+        self.page.locator(upload_box_selector).wait_for(timeout=10000, state="visible")
         # 切换手动上传封面标签
-        self.page.locator(upload_box_selector + '//div[@role="tab" and text()="上传封面"]').click()
+        self.page.locator(
+            upload_box_selector + '//div[contains(@class, "tab")]/div[contains(@class, "tabItem") and text()="上传封面"]').click()
         # 等待上传触发区域显示
-        trigger_selector = upload_box_selector + '//label[contains(@class,"upload-btn")]'
-        # 显示上传触发区域
-        self.page.locator(trigger_selector).wait_for(state="visible")
+        trigger_selector = upload_box_selector + '//div[contains(@class,"semi-upload") and @x-prompt-pos="right"]'
+        trigger_upload = self.page.locator(trigger_selector)
+        trigger_upload.wait_for(timeout=3000, state="visible")
         # 上传封面图片
         with self.page.expect_file_chooser() as fc_info:
             self.page.locator(trigger_selector).click()
 
         fc_info.value.set_files(image_path)
-        # 裁切封面
-        cut_selector = 'xpath=//div[text()="裁剪封面"]'
-        # 预览封面
-        cut_preview_selector = cut_selector + '/following-sibling::div[contains(@class, "cover-cut")]//div[contains(@class, "cover-preview__img")]/img'
-        self.page.locator(cut_preview_selector).wait_for(state="visible")
-        # 点击裁切确认按钮
-        cut_ok_selector = cut_selector + '/following-sibling::div[contains(@class, "dialog-operation")]/button[text()="确定"]'
-        self.page.locator(cut_ok_selector).click()
-        self.page.wait_for_load_state("domcontentloaded")
-        # 检查裁切操作是否有提示
-        toast = self.toast()
+        # 检查是否有上传提示
+        toast = self.page.locator('xpath=//div[contains(@class, "semi-toast-wrapper")]/div[contains(@class, "semi-toast-warning") or contains(@class, "semi-toast-error")]')
         try:
             toast.wait_for(timeout=1000, state="visible")
             toast_text = toast.inner_text()
@@ -133,10 +148,8 @@ class ContentUploadImageTextPage(BasePage):
 
         # 完成按钮
         ok_btn = self.page.locator(
-            upload_box_selector + '//div[contains(@class, "operation")]//button[text()="确定"]')
-        # 等待”完成“按钮激活
-        self.page.wait_for_timeout(1500)
-        # ok_btn.wait_for(state="visible")
+            upload_box_selector + '//div[contains(@class, "uploadCrop")]//button[span[text()="完成"]]')
+        ok_btn.wait_for(timeout=10000, state="visible")
         # 点击完成按钮
         ok_btn.click()
         # 等待上传框隐藏
@@ -153,34 +166,53 @@ class ContentUploadImageTextPage(BasePage):
         except Exception as e:
             log.logger.error(e, exc_info=True)
             raise e
-        self.page.locator(upload_box_selector).wait_for(timeout=120000, state="detached")
-
-
-    def text_title(self):
-        """
-        作品标题
-        """
-        return self.page.locator(
-            'xpath=//div[contains(@class,"card-container-creator-layout")]//input[contains(@placeholder, "添加作品标题")]')
+        self.page.locator(upload_box_selector).wait_for(timeout=10000, state="hidden")
 
     def text_description(self):
         """
         作品描述
         """
         return self.page.locator(
-            'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "zone-container") and contains(@data-placeholder, "作品描述")]')
+            'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "zone-container")]')
 
-    def set_download_image(self, is_checked=False):
+    def set_sync_toutiao(self, is_checked=False):
         """
-        允许他人保存图片
+        同步到今日头条
+
+        Args:
+            is_checked (bool, optional): 是否选中同步到今日头条的开关，默认为False
+
+        Returns:
+            bool: 操作是否成功的标志，始终返回True
+
+        """
+        try:
+            locator = self.page.locator(
+                'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "toutiao")]/following-sibling::div/div[contains(@class, "semi-switch")]')
+            locator.wait_for(timeout=1000, state="visible")
+            class_attribute = locator.get_attribute("class")
+            if is_checked is not None:
+                if is_checked is True and "semi-switch-checked" not in class_attribute:
+                    # 选中今日头条同步开关
+                    locator.click()
+                elif is_checked is False and "semi-switch-checked" in class_attribute:
+                    # 取消选中今日头条同步开关
+                    locator.click()
+        except PlaywrightTimeoutError as e:
+            log.logger.error("同步到头条选择switch未出现，可能是由于当前账号未关联头条", exc_info=True)
+
+        return True
+
+    def set_download_content(self, is_checked=False):
+        """
+        允许他人保存视频
 
         Args:
             is_checked (bool, optional): 是否允许他人保存视频，默认为False
 
         """
-
         if not is_checked:
-            selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[text()="允许他人保存图片"]/following-sibling::div[1]/div'
+            selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "form")]//div[contains(@class, "download-content")]/div'
             label_allow = self.page.locator(selector + '/label[span[text()="允许"]]')
             label_disallow = self.page.locator(selector + '/label[span[text()="不允许"]]')
             if is_checked is True:
@@ -203,7 +235,7 @@ class ContentUploadImageTextPage(BasePage):
         """
         if type not in self.who_can_watch_list.keys():
             raise Exception("参数错误")
-        selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[text()="设置谁可以看"]/following-sibling::div[1]/div'
+        selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "form")]//div[contains(@class, "publish-settings")]/p[text()="设置谁可以看"]/following-sibling::div[1]'
         label_public = self.page.locator(selector + '/label[span[text()="公开"]]')
         label_friends = self.page.locator(selector + '/label[span[text()="好友可见"]]')
         label_private = self.page.locator(selector + '/label[span[text()="仅自己可见"]]')
@@ -232,7 +264,7 @@ class ContentUploadImageTextPage(BasePage):
         """
         if settings.get("type") not in self.release_time_list.keys():
             raise Exception("参数错误")
-        selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[text()="发布时间"]/following-sibling::div[1]/div'
+        selector = 'xpath=//div[contains(@class,"card-container-creator-layout")]//div[contains(@class, "form")]//div[contains(@class, "publish-settings")]//div[p[text()="发布时间"]]/following-sibling::div[1]'
         if settings.get("type") == "now":
             self.page.locator(selector + '/label[span[text()="立即发布"]]').click()
         elif settings.get("type") == "delay":

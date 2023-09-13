@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 
 from configs import settings
 from helpers import log, utils,redis
-from lib.exceptions import ActionException
+from libary.exceptions import ActionException
 
 
 class Base:

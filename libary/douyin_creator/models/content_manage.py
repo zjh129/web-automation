@@ -1,4 +1,4 @@
-from lib.base_page import BasePage
+from libary.base_page import BasePage
 
 
 class ContentManagePage(BasePage):
