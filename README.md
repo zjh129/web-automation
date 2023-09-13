@@ -29,3 +29,5 @@ playwright install
 ```shell
 docker run -itd --name local-redis -p 6379:6379 redis redis-server --appendonly yes
 ```
+
+4、具体使用查看tests目录页下的测试用例
