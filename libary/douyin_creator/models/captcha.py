@@ -49,6 +49,8 @@ class CaptchaPage(BasePage):
         """
         验证码检查
         """
+        if self.box_captcha().is_hidden() is False:
+            self.box_captcha().wait_for(state="attached")
         # 如果页面重定向到滑动验证码页面，需要再次滑动滑块
         current_page_title = self.page.title()
         captcha_type = self.captcha_type()

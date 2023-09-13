@@ -24,3 +24,8 @@ pip install -r requirements.txt
 ```shell
 playwright install
 ```
+
+3、docker启用redis服务
+```shell
+docker run -itd --name local-redis -p 6379:6379 redis redis-server --appendonly yes
+```

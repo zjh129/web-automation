@@ -41,10 +41,10 @@ class VerifyYdm(Base):
                 image_content = f.read()
             # 调用云码SDK
             cache_data = self.sdk.click_verify(image=image_content, verify_type=30101)
-            self.set_cache_data(cache_key, json.dumps(cache_data))
+            self.set_cache_data(cache_key, cache_data)
             return cache_data
 
-        return json.loads(cache_data)
+        return cache_data
 
     def slide(self, **kwargs):
         """
@@ -86,7 +86,7 @@ class VerifyYdm(Base):
             # 调用云码SDK
             api_rs = self.sdk.slide_verify(slide_image=gap_image_content, background_image=background_image_content)
             cache_data = {"x": float(api_rs), "y": float(0)}
-            self.set_cache_data(cache_key, json.dumps(cache_data))
+            self.set_cache_data(cache_key, cache_data)
             return cache_data
 
-        return json.loads(cache_data)
+        return cache_data

@@ -50,6 +50,6 @@ class DdddOcrVerify(Base):
 
             res = det.slide_match(target_bytes, background_bytes, simple_target=True)
             cache_data = {"x": float(res['target'][0]), "y": float(res['target'][1])}
-            self.set_cache_data(cache_key, json.dumps(cache_data))
+            self.set_cache_data(cache_key, cache_data)
             return cache_data
-        return json.loads(cache_data)
+        return cache_data

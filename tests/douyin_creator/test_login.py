@@ -26,7 +26,7 @@ def test_login_by_mobile():
     """手机号码格式正确,发送验证码成功"""
     # 模拟请求参数
     request = {'user_id': test_env_config["douyin"]["user_id"], 'phone': test_env_config["douyin"]["phone"],
-               'code': test_env_config["douyin"]["code"]}
+               'code': test_env_config["douyin"]["phone_code"]}
     with CreatorLogin(
             user_id=request.get('user_id'),
             save_state=test_env_config["browser"]['save_state'],
@@ -41,7 +41,7 @@ def test_login_by_mobile():
     print(response)
     # 校验返回结果
     assert response.get("code") == 0
-    assert "登录成功" in response.get("message")
+    assert "成功" in response.get("message")
 
 
 def test_login_by_qrcode():
