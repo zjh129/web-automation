@@ -1,5 +1,3 @@
-from content_tools.helpers import log
-from content_tools.libary.douyin.login import Login
 
 
 def test_login_by_mobile():

@@ -2,12 +2,10 @@ import json
 import os
 
 from playwright.sync_api import sync_playwright
-from redis import cluster
 
-from content_tools import settings
-from content_tools.helpers import log, utils
-from content_tools.libary.xiaohongshu.exceptions import ApiErrorCode
-from content_tools.settings import STEALTH_JS_PATH, REDIS
+from configs import settings
+from helpers import log, utils,redis
+from lib.exceptions import ActionException
 
 
 class Base:
@@ -76,7 +74,7 @@ class Base:
         self.browser = self.playwright.chromium
         # 初始化上下文
         self.context = self.create_browser_context()
-        self.context.add_init_script(path=STEALTH_JS_PATH)
+        self.context.add_init_script(path=settings.STEALTH_JS_PATH)
         # 如果当前浏览器有打开标签页，则直接返回第一个标签页
         if len(self.context.pages) > 0:
             self.page = self.context.pages[0]
@@ -171,7 +169,7 @@ class Base:
         获取手机验证码
         """
         sms_code_key = f"login_by_mobile:{self.platform}:{phone}"
-        sms_code_value = settings.RedisCluster.get(sms_code_key)
+        sms_code_value = redis.redis_manager.get(sms_code_key, json=False)
         return sms_code_value
 
     def mobile_code_set(self, phone, code):
@@ -179,24 +177,21 @@ class Base:
         设置手机验证码
         """
         sms_code_key = f"login_by_mobile:{self.platform}:{phone}"
-        return settings.RedisCluster.set(sms_code_key, code, ex=60 * 5)
+        return redis.redis_manager.set(sms_code_key, code, ex=60 * 5, json=False)
 
     def mobile_code_del(self, phone):
         """
         删除手机验证码
         """
         sms_code_key = f"login_by_mobile:{self.platform}:{phone}"
-        return settings.RedisCluster.delete(sms_code_key)
+        return redis.redis_manager.delete(sms_code_key)
 
     def scan_login_qrcode_result_get(self):
         """
         获取扫码登录结果
         """
         scan_login_qrcode_result_key = f"scan_login_qrcode_result:{self.platform}:{self.user_id}"
-        scan_login_qrcode_result_value = settings.RedisCluster.get(scan_login_qrcode_result_key)
-        if scan_login_qrcode_result_value is None:
-            return None
-        return json.loads(scan_login_qrcode_result_value)
+        return redis.redis_manager.get(scan_login_qrcode_result_key)
 
     def scan_login_qrcode_result_set(self, **kwargs):
         """
@@ -230,14 +225,14 @@ class Base:
         if kwargs.get("user_profile") is not None:
             data["user_profile"] = kwargs.get("user_profile")
         scan_login_qrcode_result_key = f"scan_login_qrcode_result:{self.platform}:{self.user_id}"
-        return settings.RedisCluster.set(scan_login_qrcode_result_key, json.dumps(data), ex=60 * 5)
+        return redis.redis_manager.set(scan_login_qrcode_result_key, data, ex=60 * 5)
 
     def scan_login_qrcode_result_del(self):
         """
         删除扫码登录结果
         """
         scan_login_qrcode_result_key = f"scan_login_qrcode_result:{self.platform}:{self.user_id}"
-        return settings.RedisCluster.delete(scan_login_qrcode_result_key)
+        return redis.redis_manager.delete(scan_login_qrcode_result_key)
 
     def close(self):
         """
@@ -271,7 +266,7 @@ class Base:
 
     def __enter__(self):
         if self.user_id == "" or self.user_id is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_USER_ID_EMPTY)
+            raise ActionException(ActionException.CODE_USER_ID_EMPTY)
         # 启动浏览器
         self.launch_browser()
         """

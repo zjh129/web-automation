@@ -1,8 +1,4 @@
-from content_tools.helpers import log
-from content_tools.libary.douyin.models.base_page import BasePage
-from content_tools.libary.xiaohongshu.exceptions import ApiErrorCode
-from playwright.async_api import TimeoutError as PlaywrightTimeoutError
-from datetime import datetime, timedelta
+from lib.base_page import BasePage
 
 
 class ContentDataDetailPage(BasePage):

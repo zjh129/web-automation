@@ -1,8 +1,9 @@
-from content_tools.helpers import log
-from content_tools.libary.douyin.models.base_page import BasePage
-from content_tools.libary.xiaohongshu.exceptions import ApiErrorCode
 from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from datetime import datetime, timedelta
+
+from helpers import log
+from lib.base_page import BasePage
+from lib.exceptions import ActionException
 
 
 class ContentUploadImageTextPage(BasePage):
@@ -120,9 +121,9 @@ class ContentUploadImageTextPage(BasePage):
             toast.wait_for(timeout=1000, state="visible")
             toast_text = toast.inner_text()
             if toast.is_visible() and toast_text != "":
-                raise ApiErrorCode(ApiErrorCode.CODE_DOUYIN_VIDEO_COVER_UPLOAD_ERROR,
+                raise ActionException(ActionException.CODE_DOUYIN_VIDEO_COVER_UPLOAD_ERROR,
                                    "上传封面失败,错误内容为：" + toast_text)
-        except ApiErrorCode as e:
+        except ActionException as e:
             raise e
         except PlaywrightTimeoutError as e:
             log.logger.error("提示框不出现，继续执行", exc_info=True)
@@ -143,9 +144,9 @@ class ContentUploadImageTextPage(BasePage):
             toast.wait_for(timeout=1000, state="visible")
             toast_text = toast.inner_text()
             if toast.is_visible() and toast_text != "":
-                raise ApiErrorCode(ApiErrorCode.CODE_DOUYIN_VIDEO_COVER_UPLOAD_ERROR,
+                raise ActionException(ActionException.CODE_DOUYIN_VIDEO_COVER_UPLOAD_ERROR,
                                    "上传封面失败,错误内容为：" + toast_text)
-        except ApiErrorCode as e:
+        except ActionException as e:
             raise e
         except PlaywrightTimeoutError as e:
             log.logger.error("提示框不出现，继续执行", exc_info=True)
@@ -238,12 +239,12 @@ class ContentUploadImageTextPage(BasePage):
             self.page.locator(selector + '//label[span[text()="定时发布"]]').click()
             # 设置定时发布时间
             if settings.get("time", "") == "":
-                raise ApiErrorCode(ApiErrorCode.CODE_PARAM_MISSING,
+                raise ActionException(ActionException.CODE_PARAM_MISSING,
                                    "发布时间不能为空")
             input_time = datetime.strptime(settings.get("time"), '%Y-%m-%d %H:%M')
             now = datetime.now()
             if input_time < now - timedelta(hours=2) or input_time > now + timedelta(days=14):
-                raise ApiErrorCode(ApiErrorCode.CODE_DOUYIN_PUBLISH_TIME_ERROR,
+                raise ActionException(ActionException.CODE_DOUYIN_PUBLISH_TIME_ERROR,
                                    "发布时间必须在当前时间前后2小时或14天内")
             self.page.locator(selector + '//div[contains(@class, "date-picker")]//input').fill(settings.get("time"))
 

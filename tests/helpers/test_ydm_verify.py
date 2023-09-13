@@ -1,7 +1,7 @@
 import os
 
-from content_tools import settings
-from content_tools.libary.verify.sdk import ydm_verify
+from configs import settings
+from helpers.verify.sdk import ydm_verify
 
 
 def test_click_verify():

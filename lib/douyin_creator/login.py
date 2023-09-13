@@ -1,14 +1,14 @@
 import os
 import random
 
-from content_tools import settings
-from content_tools.helpers import log, utils, download
-from content_tools.helpers.common import mq_json_response, validate_phone_number
-from content_tools.libary.base import exception
-from content_tools.libary.douyin.creator_base import CreatorBase
-from content_tools.libary.douyin.models_creator.captcha_page import CaptchaPage
-from content_tools.libary.douyin.models_creator.content_login_page import ContentLoginPage
-from content_tools.libary.xiaohongshu.exceptions import ApiErrorCode
+from configs import settings
+from helpers import log, download, utils
+from helpers.common import validate_phone_number
+from lib.douyin_creator.base import CreatorBase
+from lib.douyin_creator.models.captcha import CaptchaPage
+from lib.douyin_creator.models.content_login import ContentLoginPage
+from lib.exception_handler import exception_handler
+from lib.exceptions import ActionException
 
 
 class CreatorLogin(CreatorBase):
@@ -23,7 +23,7 @@ class CreatorLogin(CreatorBase):
     login_type_account = "account"  # 账号密码登录
     login_type_cookie = "cookie"  # cookie登录
 
-    @exception.exception_handler
+    @exception_handler
     def login(self, login_type, request):
         """
         登录
@@ -34,7 +34,7 @@ class CreatorLogin(CreatorBase):
         page.to_home()
         # 提前检查登录状态，不做无用的登录操作
         if self.check_login_state():
-            raise ApiErrorCode(0, "您已登录成功")
+            raise ActionException(0, "您已登录成功")
         # 点击登录按钮，弹出登录框
         page.btn_login().click()
         # select login type
@@ -108,7 +108,7 @@ class CreatorLogin(CreatorBase):
                     try:
                         # 自动检验安全验证码
                         captcha_page.check_captcha()
-                    except ApiErrorCode as e:
+                    except ActionException as e:
                         # 该类异常表示程序无需重试，直接抛出异常
                         raise e
                     except Exception as e:
@@ -122,7 +122,7 @@ class CreatorLogin(CreatorBase):
                         # 在无人工操作的情况下，验证码弹框在验证成功后自动消失
                         if not captcha_page.box_captcha().is_visible():
                             captcha_verify_success = True
-            except ApiErrorCode as e:
+            except ActionException as e:
                 # 该类异常表示程序无需重试，直接抛出异常
                 raise e
             except Exception as e:
@@ -140,12 +140,12 @@ class CreatorLogin(CreatorBase):
         if send_verify_success is True:
             return {"message": "发送验证码成功"}
         elif response_json is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_UNKNOWN_ERROR, "发送验证码请求失败")
+            raise ActionException(ActionException.CODE_UNKNOWN_ERROR, "发送验证码请求失败")
         elif response_json.get("error_code") != 0:
             # 不存在errorCode参数或不存在errorMsg参数时，使用默认错误码
-            error_code = response_json.get("error_code", ApiErrorCode.CODE_UNKNOWN_ERROR)
+            error_code = response_json.get("error_code", ActionException.CODE_UNKNOWN_ERROR)
             error_msg = response_json.get("description", "")
-            raise ApiErrorCode(error_code, error_msg)
+            raise ActionException(error_code, error_msg)
 
     def login_by_mobile(self, request):
         """
@@ -193,12 +193,12 @@ class CreatorLogin(CreatorBase):
             response_json = response_info.value.json()
 
         if response_json is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_UNKNOWN_ERROR, "登录失败，未捕获响应")
+            raise ActionException(ActionException.CODE_UNKNOWN_ERROR, "登录失败，未捕获响应")
         elif response_json.get("error_code") != 0:
             # 不存在errorCode参数或不存在errorMsg参数时，使用默认错误码
-            error_code = response_json.get("error_code", ApiErrorCode.CODE_UNKNOWN_ERROR)
+            error_code = response_json.get("error_code", ActionException.CODE_UNKNOWN_ERROR)
             error_msg = response_json.get("description", "")
-            raise ApiErrorCode(error_code, error_msg)
+            raise ActionException(error_code, error_msg)
         return {"message": "登录成功"}
 
     def validate_phone(self, phone):
@@ -208,12 +208,12 @@ class CreatorLogin(CreatorBase):
         """
         # 如果phone为空，返回错误信息
         if not phone:
-            raise ApiErrorCode(ApiErrorCode.CODE_PHONE_NUMBER_EMPTY)
+            raise ActionException(ActionException.CODE_PHONE_NUMBER_EMPTY)
 
         # 如果phone格式不正确，返回错误信息
         is_valid = validate_phone_number(phone)
         if not is_valid:
-            raise ApiErrorCode(ApiErrorCode.CODE_PHONE_INCORRECT)
+            raise ActionException(ActionException.CODE_PHONE_INCORRECT)
 
     def login_by_qrcode(self):
         """
@@ -249,7 +249,7 @@ class CreatorLogin(CreatorBase):
             try:
                 # 如果错误提示框存在，则抛出异常
                 # if page.scan_code_error().is_visible():
-                #     raise ApiErrorCode(ApiErrorCode.CODE_LOGIN_ERROR, page.msg_box_error().inner_text())
+                #     raise ActionException(ActionException.CODE_LOGIN_ERROR, page.msg_box_error().inner_text())
                 # 如果刷新按钮存在，则点击刷新按钮
                 if page.btn_scan_refresh().is_visible():
                     page.btn_scan_refresh().click()
@@ -276,7 +276,7 @@ class CreatorLogin(CreatorBase):
                     },
                     qrcode_expired=up_qrcode_expired,
                 )
-            except ApiErrorCode as e:
+            except ActionException as e:
                 # 该类异常表示程序无需重试，直接抛出异常
                 raise e
             except Exception as e:
@@ -303,7 +303,7 @@ class CreatorLogin(CreatorBase):
 
         if login_success is False:
             self.scan_login_qrcode_result_del()
-            raise ApiErrorCode(ApiErrorCode.CODE_LOGIN_ERROR, "扫码登录等待到达5分钟，未捕获响应")
+            raise ActionException(ActionException.CODE_LOGIN_ERROR, "扫码登录等待到达5分钟，未捕获响应")
         result = {"user_id": self.user_id, "user_profile": response_json.get("user_profile", {})}
         # 将登录结果存储到redis中
         self.scan_login_qrcode_result_set(login_state=True, user_profile=response_json.get("user_profile", {}))
@@ -314,14 +314,14 @@ class CreatorLogin(CreatorBase):
         扫码登录图片base64获取
         """
         if self.user_id == "":
-            raise ApiErrorCode(ApiErrorCode.CODE_USER_ID_EMPTY)
+            raise ActionException(ActionException.CODE_USER_ID_EMPTY)
 
         cache_data = self.scan_login_qrcode_result_get()
         if cache_data is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_LOGIN_ERROR, "请先触发扫码登录")
+            raise ActionException(ActionException.CODE_LOGIN_ERROR, "请先触发扫码登录")
         qrcode_info = cache_data.get("qrcode_info")
         if cache_data is None or qrcode_info is None or qrcode_info.get("qrcode_file_path") is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_LOGIN_ERROR, "二维码图片不存在")
+            raise ActionException(ActionException.CODE_LOGIN_ERROR, "二维码图片不存在")
         # 如果二维码已经读取过，则将二维码过期的标识删除
         if cache_data.get("qrcode_expired", False) is True:
             self.scan_login_qrcode_result_set(qrcode_expired=False)
@@ -329,7 +329,7 @@ class CreatorLogin(CreatorBase):
         # 将二维码图片转换为base64字符串
         qrcode_base64 = download.image_to_base64(qrcode_info.get("qrcode_file_path"))
         if qrcode_base64 is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_LOGIN_ERROR, "二维码图片无效或不存在")
+            raise ActionException(ActionException.CODE_LOGIN_ERROR, "二维码图片无效或不存在")
         # 返回二维码图片的base64字符串
         return {"qrcode_base64": qrcode_base64, 'login_desc': qrcode_info.get('login_desc', "")}
 
@@ -345,7 +345,7 @@ class CreatorLogin(CreatorBase):
         # 验证密码不为空
         password = request.get("password", "")
         if password == "":
-            raise ApiErrorCode(ApiErrorCode.CODE_PASSWORD_EMPTY)
+            raise ActionException(ActionException.CODE_PASSWORD_EMPTY)
         # 初始化页面元素模型
         page = ContentLoginPage(self.page)
 
@@ -378,12 +378,12 @@ class CreatorLogin(CreatorBase):
             response_json = response_info.value.json()
 
         if response_json is None:
-            raise ApiErrorCode(ApiErrorCode.CODE_UNKNOWN_ERROR, "登录失败，未捕获响应")
+            raise ActionException(ActionException.CODE_UNKNOWN_ERROR, "登录失败，未捕获响应")
         elif response_json.get("error_code") != 0:
             # 不存在errorCode参数或不存在errorMsg参数时，使用默认错误码
-            error_code = response_json.get("error_code", ApiErrorCode.CODE_UNKNOWN_ERROR)
+            error_code = response_json.get("error_code", ActionException.CODE_UNKNOWN_ERROR)
             error_msg = response_json.get("description", "")
-            raise ApiErrorCode(error_code, error_msg)
+            raise ActionException(error_code, error_msg)
         return {"message": "登录成功"}
 
     def login_by_cookies(self, request):
@@ -398,7 +398,7 @@ class CreatorLogin(CreatorBase):
             }])
         return {}
 
-    @exception.exception_handler
+    @exception_handler
     def get_login_state(self):
         """
         获取登录状态

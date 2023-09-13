@@ -1,6 +1,5 @@
 from helpers import utils
-from content_tools.libary.base.base import Base
-from content_tools.libary.xiaohongshu.exceptions import ApiErrorCode
+from lib.base import Base
 
 
 class CreatorBase(Base):

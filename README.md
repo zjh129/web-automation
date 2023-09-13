@@ -15,12 +15,12 @@
 
 1. 安装依赖库
 
-   ```shell
-   pip install -r requirements.txt
-   ```
+```shell
+pip install -r requirements.txt
+```
 
 2. 安装playwright浏览器驱动
 
-   ```shell
-   playwright install
-   ```
+```shell
+playwright install
+```

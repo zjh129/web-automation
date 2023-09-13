@@ -4,11 +4,11 @@ from datetime import datetime
 
 from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 
-from content_tools import settings
-from content_tools.helpers import utils, log
-from content_tools.libary.douyin.models.base_page import BasePage
-from content_tools.libary.verify import factory
-from content_tools.libary.xiaohongshu.exceptions import ApiErrorCode
+from configs import settings
+from helpers import log, utils
+from helpers.verify import factory
+from lib.base_page import BasePage
+from lib.exceptions import ActionException
 
 
 class CaptchaPage(BasePage):
@@ -90,7 +90,7 @@ class CaptchaPage(BasePage):
                 break
             try:
                 self.move_slider(back_selector, gap_selector, move_step, slider_level)
-            except ApiErrorCode as e:
+            except ActionException as e:
                 # 该类异常表示程序无需重试，直接抛出异常
                 raise e
             except Exception as e:
@@ -220,7 +220,7 @@ class CaptchaPage(BasePage):
                     verify_rs = factory.create_verify(factory.VERIFY_TYPE_YDM).same_shape(image_path=image_path, resize=(268, 150))
                 except Exception as e:
                     log.logger.error(f"验证码解码服务失败, error: {e}")
-                    raise ApiErrorCode(ApiErrorCode.CODE_VERIFY_SERVICE_ERROR, f"验证码解码服务失败, error: {e}")
+                    raise ActionException(ActionException.CODE_VERIFY_SERVICE_ERROR, f"验证码解码服务失败, error: {e}")
                 bounding_box = element.bounding_box()  # type: ignore
                 # 点击标识位置
                 for item in verify_rs:
@@ -239,7 +239,7 @@ class CaptchaPage(BasePage):
                         continue
                     else:
                         verify_success = True
-            except ApiErrorCode as e:
+            except ActionException as e:
                 # 该类异常表示程序无需重试，直接抛出异常
                 raise e
             except Exception as e:
@@ -253,6 +253,6 @@ class CaptchaPage(BasePage):
                     # 验证过于频繁，直接退出整个验证程序
                     alert_text = self.page.locator(alert_selector).inner_text()
                     if "验证过于频繁" in alert_text:
-                        raise ApiErrorCode(ApiErrorCode.CODE_VERIFY_TOO_MANY_TIMES, alert_text)
+                        raise ActionException(ActionException.CODE_VERIFY_TOO_MANY_TIMES, alert_text)
                 # 等待1秒再操作
                 self.page.wait_for_timeout(1000)

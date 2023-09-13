@@ -1,4 +1,4 @@
-from content_tools.libary.douyin.models.base_page import BasePage
+from lib.base_page import BasePage
 
 
 class ContentLoginPage(BasePage):

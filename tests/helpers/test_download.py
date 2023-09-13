@@ -1,8 +1,8 @@
 import os
 from datetime import datetime
 
-from content_tools import settings
-from content_tools.helpers import download
+from configs import settings
+from helpers import download
 
 
 def test_download_image():
