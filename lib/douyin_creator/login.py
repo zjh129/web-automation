@@ -387,13 +387,13 @@ class CreatorLogin(CreatorBase):
         return {"message": "登录成功"}
 
     def login_by_cookies(self, request):
-        log.logger.info("Begin login douyin by cookie ...")
+        log.logger.info("Begin login douyin_creator by cookie ...")
         cookie_str = request.get('cookie_str', '')
         for key, value in utils.convert_str_cookie_to_dict(cookie_str).items():
             self.context.add_cookies([{
                 'name': key,
                 'value': value,
-                'domain': ".douyin.com",
+                'domain': ".douyin_creator.com",
                 'path': "/"
             }])
         return {}

@@ -1,4 +1,12 @@
-import yaml
+import os
 
-with open(f"./config.yaml", 'r') as f:
+import yaml
+from configs import settings
+
+# 优先读取local的配置文件
+yaml_file_path = f"{settings.BASE_DIR}/tests/config.local.yaml"
+if not os.path.exists(yaml_file_path):
+    yaml_file_path = f"{settings.BASE_DIR}/tests/config.yaml"
+
+with open(yaml_file_path, 'r', encoding='utf-8') as f:
     test_env_config = yaml.load(f.read(), Loader=yaml.FullLoader)

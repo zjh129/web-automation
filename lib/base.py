@@ -164,28 +164,6 @@ class Base:
         }
         return playwright_proxy
 
-    def mobile_code_get(self, phone):
-        """
-        获取手机验证码
-        """
-        sms_code_key = f"login_by_mobile:{self.platform}:{phone}"
-        sms_code_value = redis.redis_manager.get(sms_code_key, json=False)
-        return sms_code_value
-
-    def mobile_code_set(self, phone, code):
-        """
-        设置手机验证码
-        """
-        sms_code_key = f"login_by_mobile:{self.platform}:{phone}"
-        return redis.redis_manager.set(sms_code_key, code, ex=60 * 5, json=False)
-
-    def mobile_code_del(self, phone):
-        """
-        删除手机验证码
-        """
-        sms_code_key = f"login_by_mobile:{self.platform}:{phone}"
-        return redis.redis_manager.delete(sms_code_key)
-
     def scan_login_qrcode_result_get(self):
         """
         获取扫码登录结果

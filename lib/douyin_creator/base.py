@@ -7,7 +7,7 @@ class CreatorBase(Base):
     抖音创作服务平台基础类
     """
     base_url = "https://creator.douyin.com"
-    platform = "douyin-creator"
+    platform = "douyin_creator-creator"
 
     def check_login_state(self):
         """

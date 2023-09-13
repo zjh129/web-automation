@@ -1,16 +1,15 @@
 # 抖音测试配置
 douyin:
-  user_id: '15555555555' # 抖音用户ID
-  phone: '15555555555' # 抖音用户手机号
+  user_id: '18520396239' # 抖音用户ID
+  phone: '18520396239' # 抖音用户手机号
   phone_code: '022231' # 手机验证码
   password: '123456' # 抖音用户密码
   content: # 抖音n内容配置
-    aweme_id: '123456789' # 抖音视频ID
-
+    aweme_id: '6808198148148140807' # 抖音视频ID
 
 # browser测试配置
 browser:
-  browser_devtools: true #是否开启浏览器开发者工具
+  browser_devtools: false #是否开启浏览器开发者工具
   save_state: true #是否保存浏览器状态
   save_state_level: "cookies" #保存浏览器状态的级别
   headless: false #是否开启无头模式

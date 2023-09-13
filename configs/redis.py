@@ -5,5 +5,5 @@ REDIS = {
     "cluster": env_config["redis"]["cluster"],
     "host": env_config["redis"]["host"],
     "port": env_config["redis"]["port"],
-    "passwd": env_config["passwd"],
+    "passwd": env_config["redis"]["passwd"],
 }
