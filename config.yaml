@@ -7,3 +7,6 @@ redis:
   host: '127.0.0.1' # 单机模式配置
   port: 6379 # 单机模式配置
   passwd: 'test'  # redis密码
+
+verify_ydm:
+  token: 'xxxx' # 云打码token

@@ -1,3 +1,4 @@
+from configs.verify import VERIFY
 from helpers.verify.abstract import Abstract
 from helpers.verify.verify_ddddocr import DdddOcrVerify
 from helpers.verify.verify_ydm import VerifyYdm
@@ -13,7 +14,7 @@ def create_verify(type: str) -> Abstract:
     """
     if type == VERIFY_TYPE_YDM:
         # token可从配置中获取，目前写死
-        return VerifyYdm(token="288PYUoIsPS4xxC7S0yqeLvDiZ5toYd61bjNXO9dTfk")
+        return VerifyYdm(token=VERIFY["ydm"]["token"])
     elif type == VERIFY_TYPE_DDDDOCR:
         return DdddOcrVerify()
     else:

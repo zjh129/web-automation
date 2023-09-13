@@ -130,9 +130,6 @@ class CaptchaPage(BasePage):
         )
         gap_src = str(gap_elements.get_property("src"))  # type: ignore
 
-        # 识别滑块位置
-        # slide_app = utils.Slide(gap=gap_src, bg=slide_back, child_dir=strings.calculate_md5(slide_back), bg_size=(268, 150), gap_size=(55, 55))
-        # distance = slide_app.discern()
         # 调用验证码识别工厂验证滑块位置
         res = factory.create_verify(factory.VERIFY_TYPE_DDDDOCR).slide(
             gap_image_path=gap_src,
